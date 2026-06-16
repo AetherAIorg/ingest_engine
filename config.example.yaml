@@ -1,0 +1,15 @@
+watch:
+  - path: ../metricgraph/demo/investment_ops_demo
+    recursive: true
+    include: ["*.xlsx", "*.sql", "*.dax", "*.py"]
+    exclude: ["*.csv"]
+poll_interval_seconds: 5
+store_dir: ./.ingest_store
+state_db: ./.ingest_state.db
+compression_level: 6
+sink:
+  type: metricgraph
+  metricgraph:
+    base_url: http://localhost:8000
+    delete_on_change: true
+    owner: Investment Operations
