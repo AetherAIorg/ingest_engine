@@ -23,9 +23,17 @@ class MetricGraphSinkConfig:
 
 
 @dataclass
+class WebhookSinkConfig:
+    url: str = ""
+    secret: str = ""
+
+
+@dataclass
 class SinkConfig:
+    # "log" | "metricgraph" | "webhook" | "composite"
     type: str = "log"
     metricgraph: MetricGraphSinkConfig = field(default_factory=MetricGraphSinkConfig)
+    webhook: WebhookSinkConfig = field(default_factory=WebhookSinkConfig)
 
 
 @dataclass
@@ -64,12 +72,17 @@ def load_config(path: str | Path) -> IngestConfig:
 
     sink_raw = raw.get("sink") or {}
     mg_raw = sink_raw.get("metricgraph") or {}
+    wh_raw = sink_raw.get("webhook") or {}
     sink = SinkConfig(
         type=str(sink_raw.get("type", "log")),
         metricgraph=MetricGraphSinkConfig(
             base_url=str(mg_raw.get("base_url", "http://localhost:8000")),
             delete_on_change=bool(mg_raw.get("delete_on_change", True)),
             owner=mg_raw.get("owner"),
+        ),
+        webhook=WebhookSinkConfig(
+            url=str(wh_raw.get("url", "")),
+            secret=str(wh_raw.get("secret", "")),
         ),
     )
 

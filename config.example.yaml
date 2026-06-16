@@ -7,9 +7,15 @@ poll_interval_seconds: 5
 store_dir: ./.ingest_store
 state_db: ./.ingest_state.db
 compression_level: 6
+# sink.type: log | metricgraph | webhook | composite
+# Use "composite" to feed MetricGraph AND notify the integration hub.
 sink:
-  type: metricgraph
+  type: composite
   metricgraph:
     base_url: http://localhost:8000
     delete_on_change: true
     owner: Investment Operations
+  webhook:
+    # integration_hub /webhooks/ingest endpoint
+    url: http://localhost:8080/webhooks/ingest
+    secret: change-me

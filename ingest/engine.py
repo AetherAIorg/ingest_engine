@@ -8,8 +8,10 @@ from pathlib import Path
 from ingest.config import IngestConfig
 from ingest.diff import ChangeType, FileChange, compute_diff
 from ingest.scanner import scan_paths
+from ingest.sinks.composite_sink import CompositeSink
 from ingest.sinks.log_sink import LogSink
 from ingest.sinks.metricgraph_sink import MetricGraphSink
+from ingest.sinks.webhook_sink import WebhookSink
 from ingest.state import StateStore
 from ingest.store import ContentStore
 
@@ -25,8 +27,18 @@ class IngestEngine:
         self._running = True
 
     def _build_sink(self):
-        if self.config.sink.type == "metricgraph":
+        sink_type = self.config.sink.type
+        if sink_type == "metricgraph":
             return MetricGraphSink(self.config.sink.metricgraph)
+        if sink_type == "webhook":
+            return WebhookSink(self.config.sink.webhook)
+        if sink_type == "composite":
+            # MetricGraph is the primary (its artifact id is canonical); the
+            # webhook sink runs alongside it purely for notifications.
+            return CompositeSink(
+                primary=MetricGraphSink(self.config.sink.metricgraph),
+                secondaries=[WebhookSink(self.config.sink.webhook)],
+            )
         return LogSink()
 
     def stop(self) -> None:
