@@ -1,0 +1,7 @@
+.ingest_store/
+.ingest_state.db
+__pycache__/
+.pytest_cache/
+.venv/
+config.yaml
+.DS_Store

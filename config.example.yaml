@@ -1,0 +1,24 @@
+watch:
+  - path: ../metricgraph/demo/investment_ops_demo
+    recursive: true
+    include: ["*.xlsx", "*.sql", "*.dax", "*.py"]
+    exclude: ["*.csv"]
+poll_interval_seconds: 5
+store_dir: ./.ingest_store
+state_db: ./.ingest_state.db
+compression_level: 6
+# sink.type: log | metricgraph | webhook | composite
+# Use "composite" to feed MetricGraph AND notify the integration hub.
+sink:
+  type: composite
+  metricgraph:
+    base_url: http://localhost:8000
+    api_key: mg_live_...
+    delete_on_change: true
+    owner: Investment Operations
+    team: investment-operations
+    domain: Investment Performance
+  webhook:
+    # integration_hub /webhooks/ingest endpoint
+    url: http://localhost:8080/webhooks/ingest
+    secret: change-me
